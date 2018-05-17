@@ -57,7 +57,9 @@ return declare([ MismatchesMixin, NamedFeatureFiltersMixin ], {
             fmt('Sequence and Quality', this._renderSeqQual( f ), f );
         }
         /* multimapping */
-        var mm = (f.get('supplementary_alignment') || (typeof f.get('xm')!='undefined'&&f.get('xm')>1) || (typeof f.get('nh') != 'undefined' && f.get('nh') > 1 ));
+	// MJA edits, to redfine multimapping to be compatible with ShortStack tags
+        // var mm = (f.get('supplementary_alignment') || (typeof f.get('xm')!='undefined'&&f.get('xm')>1) || (typeof f.get('nh') != 'undefined' && f.get('nh') > 1 ));
+        var mm = (typeof f.get('xx') != 'undefined' && f.get('xx') > 1);
         fmt("Multimapped",mm,f);
         
         /* change filtering options to only capture the options we are interested in 
@@ -115,6 +117,7 @@ return declare([ MismatchesMixin, NamedFeatureFiltersMixin ], {
 
     // filters for BAM alignments according to some flags
     /* this function needs updated */
+    /* MJA additions marked below */
     _getNamedFeatureFilters: function() {
         return lang.mixin( {}, this.inherited( arguments ),
         {
@@ -147,6 +150,16 @@ return declare([ MismatchesMixin, NamedFeatureFiltersMixin ], {
                     return f.get('strand') != -1;
                 }
             },
+            /* MJA begin */
+            hide20:{
+                desc: 'Hide 20-mers',
+                title: 'Show/hide 20 bp-long reads',
+                id: 'smrna-select-blue',
+                func: function(f){
+                    return f.get('seq_length') != 20;
+                }
+            },
+	    /* MJA end */
             hide21:{
                 desc: 'Hide 21-mers',
                 title: 'Show/hide 21 bp-long reads',
@@ -179,6 +192,25 @@ return declare([ MismatchesMixin, NamedFeatureFiltersMixin ], {
                     return f.get('seq_length') != 24;
                 }
             },
+            /* MJA addition begin */
+            hide25:{
+                desc: 'Hide >24-mers',
+                title: 'Show/hide >24 bp-long reads',
+                id: 'smrna-select-orange',
+                func: function(f){
+                    return !(f.get('seq_length') > 24);
+                }
+            },
+            hide19:{
+                desc: 'Hide <20-mers',
+                title: 'Show/hide <20 bp-long reads',
+                id: 'smrna-select-orange',
+                func: function(f){
+                    return !(f.get('seq_length') < 20);
+                }
+            }
+	    /* MJA addition end */
+	    /* MJA commenting out ....
             hidepi:{
                 desc: 'Hide piRNAs',
                 title: 'Show/hide piRNAs (26-31 bp)',
@@ -194,7 +226,7 @@ return declare([ MismatchesMixin, NamedFeatureFiltersMixin ], {
                 func: function(f){
                     return this.config.isAnimal ? !(f.get('seq_length') < 21 || f.get('seq_length') > 31 || f.get('seq_length')==25) : !(f.get('seq_length') < 21 || f.get('seq_length') > 24);
                 }
-            }
+            }  end MJA commenting out */
         });
     },
 
@@ -203,10 +235,13 @@ return declare([ MismatchesMixin, NamedFeatureFiltersMixin ], {
         var track = this;
         return when( this._getNamedFeatureFilters() )
             .then( function( filters ) {
-                var sizesAr = ['hide21','hide22','hide23','hide24'];
-                if (track.config.isAnimal)
-                    sizesAr.push('hidepi');
-                sizesAr.push('hideOthers');
+                /* Begin MJA edits */
+                /* var sizesAr = ['hide21','hide22','hide23','hide24']; */
+                var sizesAr = ['hide19','hide20','hide21','hide22','hide23','hide24','hide25'];
+                /*if (track.config.isAnimal)
+                    sizesAr.push('hidepi'); 
+                sizesAr.push('hideOthers'); */
+                /* End MJA edits */
                 return track._makeFeatureFilterTrackMenuItems(
                    [
                        'filterQuality',

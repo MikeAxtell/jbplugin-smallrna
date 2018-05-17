@@ -39,6 +39,11 @@ define("SmallRNAPlugin/View/Track/smAlignments", [
             hideMultiMappers: false,
             hideForwardStrand: false,
             hideReverseStrand: false,
+            /* MJA insertions begin */
+            hide19: false,
+            hide20: false,
+	    hide25: false,
+            /* MJA insertions end */
             hide21: false,
             hide22: false,
             hide23: false,
@@ -295,7 +300,10 @@ define("SmallRNAPlugin/View/Track/smAlignments", [
       _trackMenuOptions: function () {
         var track = this;
         var displayOptions = [];
-        return all([this.inherited(arguments), this._alignmentsFilterTrackMenuOptions(), displayOptions])
+	// MJA original line commented out below  
+        // return all([this.inherited(arguments), this._alignmentsFilterTrackMenuOptions(), displayOptions])
+	// edited version below.  
+        return all([this.inherited(arguments), displayOptions])
           .then(function (options) {
             var o = options.shift();
             options.unshift({

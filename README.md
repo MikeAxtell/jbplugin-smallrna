@@ -4,11 +4,22 @@
 
 JBrowse plugin to support small RNA visualization
 
+The original plugin by Brigette Hofmeister is at [https://github.com/bhofmei/jbplugin-smallrna](https://github.com/bhofmei/jbplugin-smallrna)
+
+The citation is Enhanced JBrowse plugins for epigenomics data visualization Brigitte T. Hofmeister, Robert J. Schmitz BMC Bioinformatics 19(159); doi: 10.1186/s12859-018-2160-z
+
+This is a fork created by Mike Axtell to change some details of display and get compatibility with ShortStack's definition of multimapping reads. Please cite Brigitte's paper above.
+
+## Mike Axtell's changes
+
+I've forked the original plugin to modify it to suit my own preferences as far as display, and for
+compatibility with ShortStack's method of designating multimapping reads. 
+
 Based on the JBrowse tack type "Alignments2", the small RNA alignments track shows individual reads. The differences are:
 
 1.  Reads are colored by size not strand  
-2.  Reads can be filtered by size and/or multimapping  
-3.  There is animal and plant specific coloring because plant's don't have piRNAs. Plant coloring is the default.
+2.  Reads can be filtered by size and/or multimapping  -- disabled in this fork.
+3.  There is animal and plant specific coloring because plant's don't have piRNAs. Plant coloring is the default. --coloring scheme is changed in this fork, see below.
 4.  Reads are organized on a y-axis by strand with positive-strand reads above the y-axis origin and negative-strand reads below it.
 
 
@@ -40,43 +51,32 @@ Sample data is included in the plugin to test that the plugin is working properl
 
 ![Demo Image](img/demo_image.png)
 
-## The Basics
+## The Basics - modified by MJA for this fork
 - Each read is colored based on length
-  - Blue: 21 nt
-  - Green: 22 nt
-  - Purple: 23 nt
-  - Orange: 24 nt
-  - Red: piRNAs (26-31 nt)
-  - Gray: all other sizes
-  - *Colors were inspired by [this color scheme](https://mpss.danforthcenter.org/web/php/pages/legend.php?SITE=AT_sRNA)*
+  - skyblue: 20 nt
+  - blue: 21 nt
+  - mediumseagreen: 22 nt
+  - orange: 23 nt
+  - tomato: 24 nt
+  - gray: all other sizes
+  - colors were chosen to fit ShortStack's size range, and to be color-blind compatible.
+  
 - Reads are positions positions based on strand
   - Above y-axis origin: positive strand
   - Below y-axis origin: negative strand
 - Unfilled reads indicate read maps to multiple locations
-- Filtering options
-  - Filter an individual track using the track drop-down menu
-  - Filter all visible smRNA tracks using the toolbar button
-  - Filter for size, strand, read quality, multimapping
+- Filtering options -- disabled in this fork
 
 ## Plants vs Animals
-The plant-specific smRNA color scheme is the default. However, if you want to use the animal-specific color scheme, it is very easy and flexible to change.  This is compatible with the [DNA Methylation plugin](https://github.com/bhofmei/jbplugin-methylation).
-  
-Using the animal coloring scheme is enforced hierarchically. Configurations specified at a higher level overpower lower-level specification. If not specified at a specific level, inherits the setting of the level below. 
-
-| level| location | syntax|
-|--|--|--|
-|*highest* | individual track config | `isAnimal=true` |
-| | `tracks.conf` | `[general]`<br>`isAnimal=true` |
-| | `jbrowse.conf` | `[general]` <br> `isAnimal=true` |
-|*lowest*| **default** | `isAnimal=false`|
-
-Note that toolbar buttons are defined by `tracks.conf` and `jbrowse.conf`.
+- disabled in this fork
 
 ## Using small RNA Tracks
 ### File Formats
 Reads are read directly from a BAM file. Follow the instructions for the Alignments2 track to specify the file location.  
 Also, make sure the indexed BAM file (`.bam.bai`) is in the same directory as the BAM file.
 Optionally, you can also supply a BigWig file for coverage view when zoomed out. I recommend this. Otherwise the track says "Too much data to show; zoom in to see detail"
+
+In this fork, ShortStack-created BAM files are recognized.
 
 ### JSON Track Specifications
 Track specifications are similar to the Alignments2 specifications. The _label_, _type_, and _urlTemplate_ must be specified. Take note of _type_; this is the difference from Alignments2.
@@ -91,8 +91,7 @@ In trackList.json,
     "label" : "smrna",
     "storeClass" : "JBrowse/Store/SeqFeature/BAM",
     "urlTemplate" : "path/to/smallrna.bam",
-    "type" : "SmallRNAPlugin/View/Track/smAlignments",
-    "isAnimal" : true
+    "type" : "SmallRNAPlugin/View/Track/smAlignments"
 }
 ```
 
@@ -103,7 +102,6 @@ In tracks.conf,
     storeClass = JBrowse/Store/SeqFeature/BAM
     urlTemplate = path/to/smallrna.bam
     type = SmallRNAPlugin/View/Track/smAlignments
-    isAnimal = true
 
 Similar to other alignments, you can specify a BigWig file to use for the histogram view.
 
@@ -116,7 +114,6 @@ In trackList.json,
     "storeClass" : "JBrowse/Store/SeqFeature/BAM",
     "urlTemplate" : "path/to/smallrna.bam",
     "type" : "SmallRNAPlugin/View/Track/smAlignments",
-    "isAnimal" : true,
     "histograms" : {
         "storeClass" : "JBrowse/Store/SeqFeature/BigWig",
         "urlTemplate" : "path/to/smallrna.bw"
@@ -149,27 +146,17 @@ In _trackList.json_,
   "storeClass" : "JBrowse/Store/SeqFeature/BAM",
   "urlTemplate" : "path/to/smallrna.bam",
   "type" : "SmallRNAPlugin/View/Track/smHTMLAlignments",
-  "isAnimal" : true
 }
 ```
 
-### Additional configurations
-By default, mutlimapped reads are lighter/less opaque. To disable this, use `style.solidFill = true` in _tracks.conf_ and `"style":{ "solidFill" : true }` in _trackList.json_.
 
 ## Multimapping
 Traditionally, for small RNA analysis is important to know if a read maps uniquely or multiple times within the genome. In this plugin, multi-mapped reads are shown in the appropriate color for the length, but are more transparent.  
-Reads are determined to be multi mapped based on the SAM flag (read is supplementary) or the SAM attribute `NH`. Even when multiple alignments for the same read are output in the BAM file, the mapping program may not set the flag or `NH` attribute. For example, bowtie does not set these even when `-k 2+`.
+
+In this fork, multimapped reads are recognized via the XX:i tag added by ShortStack to indicate multi-mapping.
+
+filtering of multipmapped reads has been disabled, due to my preferences.
 
 ## Quality Filtering
-Mapping programs vary greatly in how they assign quality scores for reads, the `MQ` or `MAPQ` score. 
-From the [SAM format specification](http://samtools.github.io/hts-specs/SAMv1.pdf),
-  > MAPQ: MAPping Quality. It equals −10 log10 Pr{mapping position is wrong}, rounded to the nearest
-integer. A value 255 indicates that the mapping quality is not available.
+- disabled in this fork.
 
-To accommodate as many scoring schemes as possible, users can filter by minimum quality score.
-
-Reads with value 255 are always shown.
-
-## Future Plans
-The following features plan to be supported in the future.
-- Testing for smHTMLAlignments

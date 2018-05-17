@@ -26,7 +26,10 @@ define("SmallRNAPlugin/View/FeatureGlyph/smAlignment", [
             style: {
               color: function (feature, path, glyph, track) {
                 var strand = feature.get('strand');
-                var multimapping = (feature.get('supplementary_alignment') || (typeof feature.get('xm') != 'undefined' && feature.get('xm') > 1) || (typeof feature.get('nh') != 'undefined' && feature.get('nh') > 1))
+                // var multimapping = (feature.get('supplementary_alignment') || (typeof feature.get('xm') != 'undefined' && feature.get('xm') > 1) || (typeof feature.get('nh') != 'undefined' && feature.get('nh') > 1))
+                // MJA version of multimapping, for ShortStacka alignments, below
+                var multimapping = (typeof feature.get('xx') != 'undefined' && feature.get('xx') > 1);
+
                 // check if multimapping reads should be solid fill
                 if (multimapping && !track.config.style.solidFill) {
                   return null;
@@ -37,13 +40,13 @@ define("SmallRNAPlugin/View/FeatureGlyph/smAlignment", [
                 else if (seqLen == 21)
                   return glyph.getStyle(feature, '_color_blue');
                 else if (seqLen == 22)
-                  return glyph.getStyle(feature, '_color_green');
+                  return glyph.getStyle(feature, '_color_mediumseagreen');
                 else if (seqLen == 23)
-                  return glyph.getStyle(feature, '_color_purple');
-                else if (seqLen == 24)
                   return glyph.getStyle(feature, '_color_orange');
-                else if (seqLen > 25 && seqLen < 32 && track.config.isAnimal)
-                  return glyph.getStyle(feature, '_color_red');
+                else if (seqLen == 24)
+                  return glyph.getStyle(feature, '_color_tomato');
+                else if (seqLen == 20)
+                  return glyph.getStyle(feature, '_color_skyblue');
                 else
                   return glyph.getStyle(feature, '_color_gray');
               },
@@ -55,24 +58,35 @@ define("SmallRNAPlugin/View/FeatureGlyph/smAlignment", [
                 else if (seqLen == 21)
                   return glyph.getStyle(feature, '_color_blue');
                 else if (seqLen == 22)
-                  return glyph.getStyle(feature, '_color_green');
+                  return glyph.getStyle(feature, '_color_mediumseagreen');
                 else if (seqLen == 23)
-                  return glyph.getStyle(feature, '_color_purple');
-                else if (seqLen == 24)
                   return glyph.getStyle(feature, '_color_orange');
-                else if (seqLen > 25 && seqLen < 32 && track.config.isAnimal)
-                  return glyph.getStyle(feature, '_color_red');
+                else if (seqLen == 24)
+                  return glyph.getStyle(feature, '_color_tomato');
+                else if (seqLen == 20)
+                  return glyph.getStyle(feature, '_color_skyblue');
                 else
                   return glyph.getStyle(feature, '_color_gray');
               },
+
               image: 'blue',
               /* choose colors based on length */
-              _color_orange: '#F37A22', // orange - 24
-              _color_blue: '#3E98AF', // blue - 21
-              _color_purple: '#A55EA4', // purple - 23
-              _color_red: '#A94544', // red - pi
-              _color_green: '#8BC240', // green - 22
-              _color_gray: '#646464', // gray - other
+              /* Edits below by MJA  old code commented out*/		
+              /*_color_orange: '#F37A22', */ // orange - 24
+              /*_color_blue: '#3E98AF', */ // blue - 21
+              /* _color_purple: '#A55EA4', */ // purple -23
+              /* _color_red: '#A94544', */ // red - pi
+              /* _color_green: '#8BC240', */ // green - 22
+              /* _color_gray: '#646464', */ // gray - other
+
+              /* New additions by MJA */
+              _color_skyblue: '#87CEFA', // 20 mers
+              _color_blue: '#0000FF',  // 21 mers
+              _color_mediumseagreen: '#3CB371', // 22 mers
+              _color_orange: '#FFA500', // 23 mers
+              _color_tomato: '#FF6347', // 24 mers
+              _color_gray: '#808080', // <20 or >24 or some kind of undefined situation
+
               strandArrow: false,
               height: 4,
               marginBottom: 0.5,

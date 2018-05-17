@@ -68,8 +68,8 @@ define('SmallRNAPlugin/main', [
             _isAnimal: thisB._isAnimal
           });
         }
-        // toolbar button
-        browser.afterMilestone('initView', function () {
+        // toolbar button ... commented out by MJA
+        /*browser.afterMilestone('initView', function () {
           var navBox = dom.byId("navbox");
           browser.smRNAButton = new dijitButton({
             title: "Filter small RNA reads",
@@ -85,7 +85,7 @@ define('SmallRNAPlugin/main', [
               }).show();
             }
           }, domConstruct.create('button', {}, navBox))
-        });
+        }); */
 
         // handle dialog mode
         console.log(JSON.stringify(this.config.dialog));

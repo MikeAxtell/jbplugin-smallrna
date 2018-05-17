@@ -48,6 +48,20 @@ define("SmallRNAPlugin/View/Dialog/ReadFilterDialogCheck", [
 
       _initializeSizeProperties: function (args) {
         return {
+          /* MJA insertions begin */
+          hide19: {
+            id: 'hide19',
+            hide: (args.config.hide19 === true ? true : undefined),
+            'class': 'smrna-select-orange',
+            label: 'Hide <20-mers'
+          },
+          hide20: {
+            id: 'hide20',
+            hide: (args.config.hide20 === true ? true : undefined),
+            'class': 'smrna-select-blue',
+            label: 'Hide 20-mers'
+          },
+	  /* MJA insertions end */
           hide21: {
             id: 'hide21',
             hide: (args.config.hide21 === true ? true : undefined),
@@ -72,6 +86,14 @@ define("SmallRNAPlugin/View/Dialog/ReadFilterDialogCheck", [
             'class': 'smrna-select-orange',
             label: 'Hide 24-mers'
           },
+          /* MJA insertion begin */
+          hide25: {
+            id: 'hide25',
+            hide: (args.config.hide25 === true ? true : undefined),
+            'class': 'smrna-select-orange',
+            label: 'Hide >24-mers'
+          }
+          /* MJA commenting out begin...
           hidepi: {
             id: 'hidepi',
             hide: (args.config.hidepi === true ? true : undefined),
@@ -83,7 +105,8 @@ define("SmallRNAPlugin/View/Dialog/ReadFilterDialogCheck", [
             hide: (args.config.hideOthers === true ? true : undefined),
             'class': 'smrna-select-gray',
             label: 'Hide other sizes'
-          }
+          } 
+          MJA commenting out end */
         }
       },
       _initializeOtherProperties: function (args) {
